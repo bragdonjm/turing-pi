@@ -1,10 +1,15 @@
 .DEFAULT_GOAL := help
-PWD=$(shell pwd)
+PWD  =$(shell pwd)
+UID  =$(shell id -u $${USER})
+USER =$(shell echo $${USER})
+GID  =$(shell id -g $${USER})
+SID  =$(shell getent group sudo | cut -d: -f3 )
 
 APP_NAME := tpi-buildtools
 VERSION := v0.1.0
 
 help:
+	@echo "${UID} ${USER} ${GID} ${SUDO}"
 	@echo "If this thing hits 88 MPH, you are gonna see some really cool stuff."
 	@echo ""	
 	@echo "Please make sure you have docker installed before starting!"
@@ -25,21 +30,32 @@ image:
 	@echo '### Creating the docker image! ###'
 	@echo '##################################'
 	@echo ''
-	@docker build --label "version=${VERSION}" -t ${APP_NAME}:${VERSION} . 
+	@docker build \
+		--build-arg USER=${USER}     \
+		--build-arg UID=${UID}       \
+		--label "version=${VERSION}" \
+		-t ${APP_NAME}:${VERSION}    \
+		. 
 
 .PHONY: debug
 debug:
-	@docker run                \
-		-v ${PWD}:/opt/tpi     \
-		-it                    \
-		--rm                   \
-		--entrypoint /bin/bash \
+	@docker run                              \
+		-v ${PWD}:/opt/tpi                   \
+		-v /etc/passwd:/etc/passwd:ro        \
+		-v /etc/group:/etc/group:ro          \
+		-u ${UID}:${GID}                     \
+		--rm                                 \
+		-it  								 \
+		--entrypoint /bin/bash               \
 		${APP_NAME}:${VERSION}
 
 .PHONY: firmware
 firmware:
-	@docker run                \
-		-v ${PWD}:/opt/tpi     \
-		--rm                   \
-		${APP_NAME}:${VERSION} \
+	@docker run                              \
+		-v ${PWD}:/opt/tpi                   \
+		-v /etc/passwd:/etc/passwd:ro        \
+		-v /etc/group:/etc/group:ro          \
+		-u ${UID}:${GID}                     \
+		--rm                                 \
+		${APP_NAME}:${VERSION}               \
 		./mkfw.sh 1.0.0

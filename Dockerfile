@@ -14,6 +14,19 @@ RUN                   \
   libssl-dev libstdc++6 libxml-parser-perl mercurial mkbootimg subversion quilt u-boot-tools unzip xsltproc zlib1g-dev -y
      
 RUN \
-  apt-get install -y wget cpio rsync
+  apt-get install -y cpio rsync sudo vim-common wget 
+
+# Run the container as the current user to solve for any github dubious warnings
+# This will setup matching GID/UID so the docker executor will run as you
+# and you can execute sudo. 
+
+ARG UID
+ARG USER
+ARG SID
+
+RUN adduser $USER
+RUN usermod -a -G sudo -u $UID $USER
+COPY sudoers.sh /tmp/sudoers.sh
+RUN /tmp/sudoers.sh $USER
 
 WORKDIR /opt/tpi
