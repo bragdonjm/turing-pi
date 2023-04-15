@@ -1,12 +1,23 @@
+# Turing pi 2 bmc firmware builder
+Several instruction sets are showing that the current build tools are missing dependancies. To combat this, I went ahead and started a docker container  
+along with this fork so I could feel free to modify a few files here and there without messing around with the original code. I've also added a few  
+extra tools, like a dockerized build system complete with a makefile wrapper. I also looke at all pending PRs in the upstream and added those here.  
+  
+FOR THE EMPIRE!  
+  
+You will fild the .img in buildroot/output/images/  
+  
+  
+## Legacy build instructions
 ## Install the necessary dependent packages
 
-```makefile
-sudo apt-get install build-essential subversion git-core libncurses5-dev zlib1g-dev gawk flex quilt libssl-dev xsltproc libxml-parser-perl mercurial bzr ecj cvs unzip lib32z1 lib32z1-dev lib32stdc++6 libstdc++6 libncurses-dev u-boot-tools mkbootimg -y
+```bash
+sudo apt-get install build-essential subversion git-core libncurses5-dev zlib1g-dev gawk flex quilt libssl-dev xsltproc libxml-parser-perl mercurial bzr ecj cvs unzip lib32z1 lib32z1-dev lib32stdc++6 libstdc++6 libncurses-dev u-boot-tools mkbootimg bc -y
 ```
 
 ## build
 
-```makefile
+```bash
 cd buildroot
 make   BR2_EXTERNAL="../br2t113pro"  100ask_t113-pro_spinand_core_defconfig
 make cjson-rebuild
